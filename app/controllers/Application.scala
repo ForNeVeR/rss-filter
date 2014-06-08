@@ -1,11 +1,12 @@
 package controllers
 
+import com.rometools.fetcher.impl.{HashMapFeedInfoCache, HttpURLFeedFetcher}
+import com.rometools.rome.io.SyndFeedOutput
+import models.Feed
 import play.api._
 import play.api.mvc._
-import models.Feed
-import com.rometools.fetcher.impl.{HttpURLFeedFetcher, HashMapFeedInfoCache}
-import java.net.URL
 import play.twirl.api.Xml
+import java.net.URL
 
 object Application extends Controller {
 
@@ -18,15 +19,19 @@ object Application extends Controller {
 
   val feedInfoCache = HashMapFeedInfoCache.getInstance()
   val fetcher = new HttpURLFeedFetcher(feedInfoCache)
+  val writer = new SyndFeedOutput()
 
   def feed(feedName: String) = Action {
     feeds.get(feedName) match {
       case Some(feed) =>
+        Logger.info(s"Processing feed $feedName")
+
         val url = new URL(feed.url)
         val content = fetcher.retrieveFeed(url)
+        val output = writer.outputString(content)
+        
         // TODO: Filter the content.
-        // TODO: Serve the content as proper XML.
-        Ok(Xml(content.toString))
+        Ok(Xml(output))
       case None => NotFound("Feed not found.")
     }
   }
