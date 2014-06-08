@@ -1,9 +1,5 @@
 # Routes
-# This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index
-
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+# Feed content
+GET        /feed/:feedName        controllers.Application.feed(feedName)
