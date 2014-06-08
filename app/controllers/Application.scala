@@ -1,12 +1,14 @@
 package controllers
 
 import com.rometools.fetcher.impl.{HashMapFeedInfoCache, HttpURLFeedFetcher}
+import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.SyndFeedOutput
 import models.Feed
 import play.api._
 import play.api.mvc._
 import play.twirl.api.Xml
-import java.net.URL
+import scala.collection.JavaConversions._
+import scala.util.matching.Regex
 
 object Application extends Controller {
 
@@ -23,17 +25,30 @@ object Application extends Controller {
 
   def feed(feedName: String) = Action {
     feeds.get(feedName) match {
-      case Some(feed) =>
+      case Some(feedInfo) =>
         Logger.info(s"Processing feed $feedName")
 
-        val url = new URL(feed.url)
-        val content = fetcher.retrieveFeed(url)
-        val output = writer.outputString(content)
-        
-        // TODO: Filter the content.
+        Logger.info(s"Downloading feed ${feedInfo.url}")
+        val feed = fetcher.retrieveFeed(feedInfo.url)
+
+        Logger.info(s"Filtering feed $feedName")
+        filterFeed(feed, feedInfo.titleFilter)
+
+        Logger.info(s"Returning processed feed $feedName to client")
+        val output = writer.outputString(feed)
         Ok(Xml(output))
       case None => NotFound("Feed not found.")
     }
+  }
+
+  private def filterFeed(feed: SyndFeed, titleFilter: Regex) {
+    val entries = feed.getEntries
+    Logger.info(s"Entries before filtering: ${entries.size}")
+
+    val filtered = entries.filter(entry => titleFilter.findFirstIn(entry.getTitle).isDefined)
+
+    Logger.info(s"Entries after filtering: ${filtered.size}")
+    feed.setEntries(filtered)
   }
 
 }
