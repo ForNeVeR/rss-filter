@@ -1,28 +1,40 @@
 rss-filter
 ==========
-A simple application for filtering any RSS feed.
 
-Build
------
-This application uses Play framework build system - [Typesafe Activator](http://typesafe.com/activator). Go and get it
-if you still haven't. After that, simply run
-
-    $ activator run
-    
-for running the application.
-
-For production build use `activator dist` command.
-
-Deployment
-----------
-Application meant to run through [YAJSW](http://yajsw.sourceforge.net/). Follow the instructions found on the site.
-rss-filter was tested with YAJSW 11.11.
+A simple application to filter any RSS feed.
 
 Configuration
 -------------
+
 Open the `conf/application.conf` file and look for comments of `rss` section.
+
+
+Build
+-----
+
+To build the project, first install [sbt][]. After that
+
+```console
+$ sbt run
+```
+
+Deployment
+----------
+
+To prepare the application for the production environment, run
+
+```console
+$ sbt dist
+``` 
+
+This will create `target/universal/rss-filter-<version>.zip` artifact that
+should be deployed to the production site.
 
 Usage
 -----
-Start the application and direct your browser to URL `<application>/feed/<feed name>`. It will fetch the corresponding
-feed and filter it with regex.
+
+Start the application and direct your browser to URL
+`<application>/feed/<feed name>`. It will fetch the corresponding feed and
+filter it with regex.
+
+[sbt]: http://www.scala-sbt.org/
