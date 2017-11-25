@@ -30,6 +30,22 @@ $ sbt dist
 This will create `target/universal/rss-filter-<version>.zip` artifact that
 should be deployed to the production site.
 
+This application supports Docker. To deploy it, perform the following:
+
+```console
+$ sbt dist
+```
+
+Then unpack `target/universal/rss-filter-<version>.zip` into
+`docker/rss-filter` directory, and edit the
+`docker/rss-filter/conf/application.conf` file if necessary. After that:
+
+```console
+$ pwsh docker/compose.ps1
+``` 
+
+Consult `docker/compose.ps1` parameters for additional options.
+
 Usage
 -----
 
