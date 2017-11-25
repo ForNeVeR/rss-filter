@@ -8,7 +8,6 @@ Configuration
 
 Open the `conf/application.conf` file and look for comments of `rss` section.
 
-
 Build
 -----
 
