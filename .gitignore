@@ -1,5 +1,8 @@
 /docker/rss-filter/
 
+bin/
+obj/
+
 logs
 project/project
 project/target
