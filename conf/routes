@@ -1,5 +1,0 @@
-# Routes
-# ~~~~
-
-# Feed content
-GET        /feed/:feedName        controllers.Application.feed(feedName)
