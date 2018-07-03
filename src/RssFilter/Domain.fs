@@ -14,7 +14,7 @@ type Feed = XDocument
 
 let readFeed(uri : Uri) (ct : CancellationToken) : Task<Feed> =
     task {
-        use stream = XmlReader.Create(uri.ToString())
+        use stream = XmlReader.Create(uri.ToString(), XmlReaderSettings(Async = true))
         return! XDocument.LoadAsync(stream, LoadOptions.None, ct)
     }
 
@@ -23,9 +23,11 @@ let private getItemTitle(item : XElement) =
 
 let filterFeed (itemTitle : Regex) (feed : Feed) : Feed =
     let newFeed = XDocument feed
-    let items = newFeed.XPathSelectElements("/rss/channel/item")
-    items
-    |> Seq.filter(getItemTitle >> itemTitle.IsMatch)
+    let items = newFeed.XPathSelectElements "/rss/channel/item"
+    let itemsToRemove =
+        items
+        |> Seq.filter(getItemTitle >> (not << itemTitle.IsMatch))
+    itemsToRemove
     |> ResizeArray
     |> Seq.iter(fun item -> item.Remove())
     newFeed

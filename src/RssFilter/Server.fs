@@ -10,6 +10,7 @@ open FSharp.Control.Tasks.ContextInsensitive
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Options
 open Microsoft.Extensions.DependencyInjection
@@ -33,7 +34,7 @@ let private getFeedSettings (ctx : HttpContext) feedName =
     |> Seq.tryHead
 
 let private rss(content : Domain.Feed) : HttpHandler =
-    setHttpHeader "Content-Type" "application/rss+xml"
+    setHttpHeader "Content-Type" "application/rss+xml; charset=utf-8"
     >=> setBodyFromString(Domain.serialize content)
 
 let private feedHandler(feedName : string) : HttpHandler =
@@ -68,8 +69,10 @@ let private configureApp(app : IApplicationBuilder) =
     | false -> app.UseGiraffeErrorHandler errorHandler)
         .UseGiraffe(webApp)
 
-let private configureServices (services : IServiceCollection) =
-    services.AddGiraffe() |> ignore
+let private configureServices (config : IConfiguration) (services : IServiceCollection) =
+    ignore <| services.AddGiraffe()
+    ignore <| services.AddOptions()
+    ignore <| services.Configure<RssFilterSettings>(config)
 
 let private configureLogging (builder : ILoggingBuilder) =
     let filter (l : LogLevel) = l.Equals LogLevel.Error
@@ -77,13 +80,16 @@ let private configureLogging (builder : ILoggingBuilder) =
 
 [<EntryPoint>]
 let main _ =
-    let contentRoot = Directory.GetCurrentDirectory()
+    let configuration =
+        ConfigurationBuilder()
+            .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json"))
+            .Build()
     WebHostBuilder()
         .UseKestrel()
-        .UseContentRoot(contentRoot)
         .Configure(Action<IApplicationBuilder> configureApp)
-        .ConfigureServices(configureServices)
+        .ConfigureServices(configureServices configuration)
         .ConfigureLogging(configureLogging)
+        .UseConfiguration(configuration)
         .Build()
         .Run()
     0
