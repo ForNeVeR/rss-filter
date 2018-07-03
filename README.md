@@ -34,27 +34,20 @@ Deployment
 To prepare the application for the production environment, run
 
 ```console
-$ dotnet publish -c release
+$ dotnet publish -c Release -o out
 ```
 
-This will create a directory `src/RssFilter/bin/Release/netcoreapp2.1/publish`
-that should be deployed to the production site.
+This will create an `out` directory that should be deployed to the production
+site.
 
-This application supports Docker. To deploy it, perform the following:
+This application supports Docker. To deploy it, tune `appsettings.json` and
+then run the script:
 
 ```console
-$ dotnet publish -c release
+$ pwsh docker-compose.ps1
 ```
 
-Then copy the `src/RssFilter/bin/Release/netcoreapp2.1/publish` contents and
-the `src/RssFilter/appsettings.json` file into the `docker/rss-filter`
-directory, and edit the `appsettings.json` if necessary. After that:
-
-```console
-$ pwsh docker/compose.ps1
-```
-
-Consult `docker/compose.ps1` parameters for additional options.
+Consult `docker-compose.ps1` parameters for additional options.
 
 Usage
 -----

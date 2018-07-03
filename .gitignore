@@ -1,5 +1,5 @@
 /.idea
-/docker/rss-filter/
 
 bin/
 obj/
+out/

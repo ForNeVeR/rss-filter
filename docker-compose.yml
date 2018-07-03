@@ -4,4 +4,4 @@ services:
     build: .
     restart: always
     ports:
-      - ${rssfilter_web_port}:9000
+      - ${rssfilter_web_port}:80
